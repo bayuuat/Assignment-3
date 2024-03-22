@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script src="https://cdn.tailwindcss.com"></script>
+		<title>Auto Reload Data</title>
+	</head>
+	<body class="bg-neutral-800">
+		<div class="w-[90vh] mx-auto font-sans mt-20">
+			<h1 class="text-7xl font-bold text-center text-white">Aplikasi Pantau Status</h1>
+			<div class="flex gap-4 mt-10">
+        <div class="w-1/2">
+          <div class="py-2 bg-neutral-700 text-xl rounded-t-lg text-center text-white">Water Meter</div>
+          <div id="div-water" class="p-4 rounded-b-lg bg-neutral-600 h-52 text-5xl text-center">
+            <div id="stats-water" class="mb-7 text-2xl top-2">AWAS</div>
+            <p id="water">Loading...</p>
+            <p class="text-xl mt-2">m</p>
+          </div>
+        </div>
+        <div class="w-1/2">
+          <div class="py-2 bg-neutral-700 text-xl rounded-t-lg text-center text-white">Wind Meter</div>
+          <div id="div-wind" class="p-4 rounded-b-lg bg-neutral-600 h-52 text-5xl text-center">
+            <div id="stats-wind" class="mb-7 text-2xl top-2">AWAS</div>
+            <p id="wind">Loading...</p>
+            <p class="text-xl mt-2">m/s</p>
+          </div>
+        </div>
+			</div>
+		</div>
+
+		<script>
+			function getData() {
+				fetch("/data")
+					.then((response) => response.json())
+					.then((data) => {
+            const water = data.status.water;
+						const wind = data.status.wind;
+
+            const divWater = document.getElementById('div-water');
+            const divWind = document.getElementById('div-wind');
+
+						document.getElementById("water").innerText = water;
+						document.getElementById("wind").innerText = wind;
+						
+						let waterStatus;
+						if (water <= 5) {
+							waterStatus = "Aman";
+              divWater.classList.remove("bg-yellow-400")
+              divWater.classList.remove("bg-red-400")
+              divWater.classList.add("bg-green-400")
+						} else if (water >= 6 && water <= 8) {
+							waterStatus = "Siaga";
+              divWater.classList.remove("bg-green-400")
+              divWater.classList.remove("bg-red-400")
+              divWater.classList.add("bg-yellow-400")
+						} else {
+							waterStatus = "Bahaya";
+              divWater.classList.remove("bg-yellow-400")
+              divWater.classList.remove("bg-green-400")
+              divWater.classList.add("bg-red-400")
+						}
+
+						// Menentukan status wind
+						let windStatus;
+						if (wind <= 6) {
+							windStatus = "Aman";
+              divWind.classList.remove("bg-yellow-400")
+              divWind.classList.remove("bg-red-400")
+              divWind.classList.add("bg-green-400")
+						} else if (wind >= 7 && wind <= 15) {
+							windStatus = "Siaga";
+              divWind.classList.remove("bg-green-400")
+              divWind.classList.remove("bg-red-400")
+              divWind.classList.add("bg-yellow-400")
+						} else {
+							windStatus = "Bahaya";
+              divWind.classList.remove("bg-yellow-400")
+              divWind.classList.remove("bg-green-400")
+              divWind.classList.add("bg-red-400")
+						}
+
+            document.getElementById("stats-water").innerText = waterStatus;
+						document.getElementById("stats-wind").innerText = windStatus;
+
+						setTimeout(getData, 3000);
+					})
+					.catch((error) => console.error("Error:", error));
+			}
+
+			getData();
+		</script>
+	</body>
+</html>
